@@ -5,7 +5,7 @@ with sqlite3.connect("HTCS5607.db") as db:
     cursor = db.cursor()
 
 
-class InvReport:
+class AssReport:
     def __init__(self, parent):
         # Formatting Variables
         background_color = "#E3EBF8"
@@ -18,7 +18,7 @@ class InvReport:
 
         # Login Heading (row 0)
         self.menu_heading_label = Label(self.menu_frame,
-                                        text="Investigator Report",
+                                        text="Assignments Report",
                                         font="Arial 15 bold",
                                         bg=background_color,
                                         padx=150,
@@ -38,45 +38,42 @@ class InvReport:
                                  height=2,
                                  text="Return")
         self.return_btn.grid(row=0)
-        self.produce_btn = Button(self.button_frame,
-                                  width=15,
-                                  height=2,
-                                  text="Produce Report",
-                                  command=self.show_rep)
-        self.produce_btn.grid(row=0, column=1)
+        self.report_btn = Button(self.button_frame,
+                                 width=15,
+                                 height=2,
+                                 text="Produce Report",
+                                 command=self.show_ass_rep)
+        self.report_btn.grid(row=0, column=1)
 
-    def show_rep(self):
-        cursor.execute("SELECT * FROM INVESTIGATOR")
+    def show_ass_rep(self):
+        cursor.execute("SELECT * FROM ASSIGNMENT")
         for row in cursor.fetchall():
+            case_id = ""
+            case_id = row[1]
             inv_id = ""
-            inv_id = row[0]
-            inv_last = ""
-            inv_last = row[1]
-            inv_first = ""
-            inv_first = row[2]
-            inv_rate = ""
-            inv_rate = row[3]
-            inv_street = ""
-            inv_street = row[4]
-            inv_suburb = ""
-            inv_suburb = row[5]
-            inv_num = ""
-            inv_num = row[6]
-            line1 = "\nID: {}         Full Name: {}, {}\n".format(inv_id, inv_last, inv_first)
-            line2 = "Phone Number: {}         Street Address: {}, {}\n".format(inv_num, inv_street, inv_suburb)
-            cases = 0
-            cursor.execute("SELECT AssignmentID FROM ASSIGNMENT WHERE InvestigatorID=?",(inv_id,))
+            inv_id = row[2]
+            hours = ""
+            hours = row[3]
+            cursor.execute("SELECT caseDescription FROM CASES WHERE CaseID=?", (case_id,))
             for row in cursor.fetchall():
-                cases = cases+1
-            line3 = "Number of cases assigned: {}\n\n\n".format(cases)
-            line4 = "_________________________________________________\n\n\n"
+                description = ""
+                description = row[0]
+
+            cursor.execute("SELECT lastName, firstName FROM INVESTIGATOR WHERE InvestigatorID=?", (inv_id,))
+            for row in cursor.fetchall():
+                lastName = ""
+                lastName = row[0]
+                firstName = ""
+                firstName = row[1]
+
+            line1 = "\nCase ID: {}         Description: {}         Hours: {}\n".format(case_id, description, hours)
+            line2 = "Investigator ID: {}         Full Name: {}, {}\n\n\n".format(inv_id, lastName, firstName)
+            line3 = "_________________________________________________\n\n\n"
 
             self.box.config(state=NORMAL)
             self.box.insert(INSERT, line1)
             self.box.insert(INSERT, line2)
             self.box.insert(INSERT, line3)
-            self.box.insert(INSERT, line4)
-
             continue
 
 
@@ -85,5 +82,5 @@ if __name__ == "__main__":
     root = Tk()
     root.title("Main Menu")
     root.resizable(width=False, height=False)
-    something = InvReport(root)
+    something = AssReport(root)
     root.mainloop()

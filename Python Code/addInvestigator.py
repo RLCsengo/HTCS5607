@@ -12,6 +12,7 @@ class AddInvestigator:
         background_color = "#E3EBF8"
         main_font = "Arial 10"
         # Add Frame
+
         self.add_frame = Frame(width=50,
                                bg=background_color,
                                pady=10)
